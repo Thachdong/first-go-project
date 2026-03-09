@@ -67,7 +67,12 @@ internal/modules/{module}/
    - Wire dependencies in module file
 3. **Interface-first design** - Define contracts before implementations
 4. **Error handling** - Return domain-specific errors from usecases, map to HTTP in delivery layer
-5. **Testing** - Structure for testability; mock dependencies via interfaces
+6. **Standard API responses** - Use `pkg/response` for consistent response format:
+   ```go
+   response.Success(c, http.StatusOK, data, "Success message")
+   response.Error(c, http.StatusBadRequest, "Error message")
+   ```
+7. **Testing** - Structure for testability; mock dependencies via interfaces
 
 ## Review Focus Areas
 

@@ -7,6 +7,10 @@ import (
 
 	"first-go-project/configs"
 	"first-go-project/internal/infrastructure/database"
+	"first-go-project/internal/infrastructure/database/models"
+	"first-go-project/internal/modules/user"
+	"first-go-project/internal/router"
+	"first-go-project/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,24 +25,34 @@ func main() {
 	}
 	defer db.Close()
 
-	// Run migrations (add your models here when ready)
-	// if err := db.AutoMigrate(&models.User{}); err != nil {
-	//     log.Fatalf("Failed to run migrations: %v", err)
-	// }
+	// Run migrations
+	log.Println("Running database migrations...")
+	if err := db.AutoMigrate(&models.User{}); err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+	log.Println("✓ Migrations completed")
 
-	router := gin.Default()
+	// Initialize module handlers
+	userHandler := user.NewHandler(db.DB)
+
+	// Setup Gin router
+	ginRouter := gin.Default()
 
 	// Health check endpoint
-	router.GET("/ping", func(context *gin.Context) {
-		context.JSON(http.StatusOK, gin.H{
-			"message": "Pong",
-		})
+	ginRouter.GET("/ping", func(context *gin.Context) {
+		response.Success(context, http.StatusOK, gin.H{
+			"service": "first-go-project",
+			"status":  "healthy",
+		}, "Service is running")
 	})
+
+	// Setup routes
+	router.SetupUserRoutes(ginRouter, userHandler)
 
 	// Start server
 	addr := fmt.Sprintf(":%s", config.App.Port)
 	log.Printf("Server starting on %s", addr)
-	if err := router.Run(addr); err != nil {
+	if err := ginRouter.Run(addr); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
