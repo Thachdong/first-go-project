@@ -46,9 +46,14 @@
    }
    ```
 
-4. **Register migration in main.go**:
+4. **Register versioned migrations in main.go**:
    ```go
-   if err := db.AutoMigrate(&models.User{}); err != nil {
+   migrationsPath, err := filepath.Abs("internal/infrastructure/database/migrations")
+   if err != nil {
+       log.Fatalf("Failed to resolve migrations path: %v", err)
+   }
+
+   if err := db.RunMigrations(migrationsPath); err != nil {
        log.Fatalf("Failed to run migrations: %v", err)
    }
    ```
@@ -77,6 +82,15 @@
 - **Logging**: Info level (shows SQL queries)
 - **Timestamps**: Automatic UTC timestamps
 - **Soft Delete**: Enabled via `gorm.DeletedAt` in `BaseModel`
+
+## Versioned Migrations
+
+- Migration files live in `internal/infrastructure/database/migrations`
+- Use paired files per version:
+    - `000001_description.up.sql`
+    - `000001_description.down.sql`
+- Applied versions are tracked in PostgreSQL by `golang-migrate` via the `schema_migrations` table
+- On app startup, pending migrations are applied automatically
 
 ## Environment Variables
 

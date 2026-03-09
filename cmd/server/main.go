@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
 
 	"first-go-project/configs"
 	"first-go-project/internal/infrastructure/database"
-	"first-go-project/internal/infrastructure/database/models"
 	"first-go-project/internal/modules/user"
 	"first-go-project/internal/router"
 	"first-go-project/pkg/response"
@@ -25,12 +25,15 @@ func main() {
 	}
 	defer db.Close()
 
-	// Run migrations
+	// Run versioned migrations
 	log.Println("Running database migrations...")
-	if err := db.AutoMigrate(&models.User{}); err != nil {
+	migrationsPath, err := filepath.Abs("internal/infrastructure/database/migrations")
+	if err != nil {
+		log.Fatalf("Failed to resolve migrations path: %v", err)
+	}
+	if err := db.RunMigrations(migrationsPath); err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
-	log.Println("✓ Migrations completed")
 
 	// Initialize module handlers
 	userHandler := user.NewHandler(db.DB)
