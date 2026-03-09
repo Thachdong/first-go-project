@@ -1,8 +1,8 @@
 package user
 
 import (
-	"first-go-project/internal/infrastructure/repository"
 	"first-go-project/internal/modules/user/delivery"
+	"first-go-project/internal/modules/user/repository"
 	"first-go-project/internal/modules/user/usecase"
 
 	"gorm.io/gorm"

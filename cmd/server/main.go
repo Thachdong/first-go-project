@@ -35,9 +35,6 @@ func main() {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
 
-	// Initialize module handlers
-	userHandler := user.NewHandler(db.DB)
-
 	// Setup Gin router
 	ginRouter := gin.Default()
 
@@ -50,7 +47,7 @@ func main() {
 	})
 
 	// Setup routes
-	router.SetupUserRoutes(ginRouter, userHandler)
+	router.SetupUserRoutes(ginRouter, user.NewHandler(db.DB))
 
 	// Start server
 	addr := fmt.Sprintf(":%s", config.App.Port)
