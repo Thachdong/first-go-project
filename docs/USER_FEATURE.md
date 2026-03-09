@@ -2,6 +2,7 @@
 
 ## API Endpoint
 
+**Register User**: `POST /api/v1/users/register`
 **Get User Profile**: `GET /api/v1/users/:id`
 
 ## Testing Steps
@@ -33,6 +34,16 @@ This will create 3 test users:
 
 **Using curl:**
 ```bash
+# Register a user
+curl -X POST http://localhost:8080/api/v1/users/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "new.user@example.com",
+    "username": "newuser",
+    "password": "secret123",
+    "full_name": "New User"
+  }'
+
 # Get user with ID 1
 curl http://localhost:8080/api/v1/users/1
 
@@ -44,6 +55,25 @@ curl http://localhost:8080/api/v1/users/999
 ```
 
 **Expected Response (Success):**
+```json
+{
+  "status": 201,
+  "data": {
+    "id": 4,
+    "email": "new.user@example.com",
+    "username": "newuser",
+    "full_name": "New User",
+    "phone": "",
+    "address": "",
+    "city": "",
+    "province": "",
+    "zip_code": ""
+  },
+  "message": "User registered successfully"
+}
+```
+
+**Expected Response (Get Profile Success):**
 ```json
 {
   "status": 200,

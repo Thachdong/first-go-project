@@ -39,6 +39,17 @@ func (r *UserRepository) FindByEmail(email string) (*domain.User, error) {
 	return r.toDomain(&user), nil
 }
 
+func (r *UserRepository) FindByUsername(username string) (*domain.User, error) {
+	var user models.User
+	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrUserNotFound
+		}
+		return nil, err
+	}
+	return r.toDomain(&user), nil
+}
+
 func (r *UserRepository) Create(user *domain.User) error {
 	dbUser := r.toModel(user)
 	if err := r.db.Create(dbUser).Error; err != nil {
@@ -71,6 +82,7 @@ func (r *UserRepository) toDomain(user *models.User) *domain.User {
 		ID:        user.ID,
 		Email:     user.Email,
 		Username:  user.Username,
+		Password:  user.Password,
 		FullName:  user.FullName,
 		Phone:     user.Phone,
 		Address:   user.Address,
@@ -91,6 +103,7 @@ func (r *UserRepository) toModel(user *domain.User) *models.User {
 		},
 		Email:    user.Email,
 		Username: user.Username,
+		Password: user.Password,
 		FullName: user.FullName,
 		Phone:    user.Phone,
 		Address:  user.Address,

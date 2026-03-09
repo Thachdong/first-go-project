@@ -8,6 +8,7 @@ import (
 
 	"first-go-project/configs"
 	"first-go-project/internal/infrastructure/database"
+	"first-go-project/internal/modules/auth"
 	"first-go-project/internal/modules/user"
 	"first-go-project/internal/router"
 	"first-go-project/pkg/response"
@@ -47,6 +48,7 @@ func main() {
 	})
 
 	// Setup routes
+	router.SetupAuthRoutes(ginRouter, auth.NewHandler(db.DB))
 	router.SetupUserRoutes(ginRouter, user.NewHandler(db.DB))
 
 	// Start server
